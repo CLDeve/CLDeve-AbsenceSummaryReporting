@@ -8,14 +8,14 @@ st.title("Absence Summary Dashboard")
 uploaded_file = st.file_uploader("Upload an Excel File", type=["xlsx"])
 
 if uploaded_file:
-    # Load the uploaded Excel File
-    df = pd.ExcelFile(uploaded_file).parse(0)
-
     try:
-        # Ensure monthly columns are correctly identified
-        monthly_columns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        # Load the uploaded Excel File
+        df = pd.ExcelFile(uploaded_file).parse(0)
 
-        # Convert monthly columns to numeric
+        # Dynamically identify monthly columns (1–12) based on names or positions
+        monthly_columns = list(range(1, 13))
+
+        # Ensure monthly columns exist and are numeric
         df[monthly_columns] = df[monthly_columns].apply(pd.to_numeric, errors='coerce').fillna(0)
 
         # Calculate Grand Total from monthly columns
@@ -43,5 +43,7 @@ if uploaded_file:
                 file_name="Absence_Summary.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
+    except KeyError as e:
+        st.error(f"Error: Missing expected columns in the file. Details: {e}")
     except Exception as e:
-        st.error("There was an error processing the file. Please ensure it is in the correct format.")
+        st.error(f"An unexpected error occurred. Details: {e}")
