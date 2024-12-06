@@ -12,9 +12,8 @@ if uploaded_file:
     df = pd.ExcelFile(uploaded_file).parse(0)
 
     try:
-        # Dynamically identify monthly columns (1–12) based on their position or names
-        monthly_columns = df.columns[3:15]  # Adjust based on dataset structure
-        monthly_columns = [col for col in monthly_columns if col in range(1, 13) or str(col).isdigit()]
+        # Ensure monthly columns are correctly identified
+        monthly_columns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
         # Convert monthly columns to numeric
         df[monthly_columns] = df[monthly_columns].apply(pd.to_numeric, errors='coerce').fillna(0)
@@ -23,8 +22,8 @@ if uploaded_file:
         df['Grand Total'] = df[monthly_columns].sum(axis=1)
 
         # Calculate Last 6 months (July–December) and Last 3 months (October–December)
-        last_6_months = [col for col in monthly_columns if col in [7, 8, 9, 10, 11, 12]]
-        last_3_months = [col for col in monthly_columns if col in [10, 11, 12]]
+        last_6_months = [7, 8, 9, 10, 11, 12]
+        last_3_months = [10, 11, 12]
 
         df['Absence Days (Last 6 Months)'] = df[last_6_months].sum(axis=1)
         df['Absence Days (Last 3 Months)'] = df[last_3_months].sum(axis=1)
