@@ -11,13 +11,8 @@ if uploaded_file:
     # Load the uploaded Excel File
     df = pd.ExcelFile(uploaded_file).parse(0)
 
-    # Debug: Display column names
-    st.write("Columns in the uploaded file:")
-    st.write(df.columns.tolist())
-
-    # Ensure monthly columns are correctly identified (expected columns 1–12)
     try:
-        # Dynamically detect monthly columns (1–12) by their positions or expected names
+        # Dynamically identify monthly columns (1–12) based on their position or names
         monthly_columns = df.columns[3:15]  # Adjust based on dataset structure
         monthly_columns = [col for col in monthly_columns if col in range(1, 13) or str(col).isdigit()]
 
@@ -50,5 +45,4 @@ if uploaded_file:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
     except Exception as e:
-        st.error(f"Error processing the file: {e}")
-        st.write("Please ensure the uploaded file contains valid monthly columns (1–12).")
+        st.error("There was an error processing the file. Please ensure it is in the correct format.")
