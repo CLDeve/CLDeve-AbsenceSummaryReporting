@@ -12,10 +12,10 @@ if uploaded_file:
         # Load the uploaded Excel File
         df = pd.ExcelFile(uploaded_file).parse(0)
 
-        # Dynamically identify monthly columns (1–12) based on names or positions
-        monthly_columns = list(range(1, 13))
+        # Identify monthly columns dynamically
+        monthly_columns = list(range(1, 13))  # Expected month columns (1–12)
 
-        # Ensure monthly columns exist and are numeric
+        # Ensure monthly columns are numeric
         df[monthly_columns] = df[monthly_columns].apply(pd.to_numeric, errors='coerce').fillna(0)
 
         # Calculate Grand Total from monthly columns
