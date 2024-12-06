@@ -15,20 +15,28 @@ if uploaded_file:
     st.write("Columns in the uploaded file:")
     st.write(df.columns.tolist())
 
-    # Clean column names (optional, depending on inspection results)
+    # Clean column names
     df.columns = df.columns.str.strip().str.replace(" ", "_").astype(str)
 
-    # Define monthly columns dynamically based on cleaned column names
-    try:
-        monthly_columns = [str(i) for i in range(1, 13)]  # Use strings if column names are like "1", "2", ...
+    # Dynamically identify columns that correspond to months
+    # This assumes the month columns are integers or strings like "1", "2", ..., "12"
+    monthly_columns = [col for col in df.columns if col.isdigit() and 1 <= int(col) <= 12]
+
+    if not monthly_columns:
+        st.error("No valid monthly columns (1–12) found in the uploaded file.")
+    else:
+        # Ensure monthly columns are numeric
         df[monthly_columns] = df[monthly_columns].apply(pd.to_numeric, errors='coerce').fillna(0)
 
-        # Calculate Grand Total from monthly columns (1–12)
+        # Calculate Grand Total from monthly columns
         df['Grand_Total'] = df[monthly_columns].sum(axis=1)
 
         # Calculate Last 6 months (July–December) and Last 3 months (October–December)
-        df['Absence_Days_Last_6_Months'] = df[['7', '8', '9', '10', '11', '12']].sum(axis=1)
-        df['Absence_Days_Last_3_Months'] = df[['10', '11', '12']].sum(axis=1)
+        last_6_months = [col for col in monthly_columns if int(col) >= 7]
+        last_3_months = [col for col in monthly_columns if int(col) >= 10]
+
+        df['Absence_Days_Last_6_Months'] = df[last_6_months].sum(axis=1)
+        df['Absence_Days_Last_3_Months'] = df[last_3_months].sum(axis=1)
 
         # Display Data in Streamlit
         st.subheader("Absence Summary Table")
@@ -45,6 +53,3 @@ if uploaded_file:
                 file_name="Absence_Summary.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
-    except KeyError as e:
-        st.error(f"Missing expected columns: {e}")
-        st.write("Please check the uploaded file and ensure it contains all required columns (1–12, etc.).")
