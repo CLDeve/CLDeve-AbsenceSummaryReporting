@@ -16,12 +16,16 @@ if uploaded_file:
         # Ensure `Leave From` is in datetime format
         df['Leave From'] = pd.to_datetime(df['Leave From'], errors='coerce')
 
+        # Filter for relevant absence types
+        relevant_absences = ['Absent', 'Absent Without Leave', 'Sick Leave', 'Unpaid Medical leave']
+        df_filtered = df[df['Absence Type'].isin(relevant_absences)]
+
         # Extract the month names (Jan, Feb, ...) from `Leave From`
-        df['Month'] = df['Leave From'].dt.strftime('%b').str.lower()
+        df_filtered['Month'] = df_filtered['Leave From'].dt.strftime('%b').str.lower()
 
         # Create a pivot table to calculate absences by month
         monthly_absence = (
-            df.pivot_table(
+            df_filtered.pivot_table(
                 index=['Personnel No.', 'Employee Name'],
                 columns='Month',
                 values='Quota Days',
