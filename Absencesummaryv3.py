@@ -15,20 +15,20 @@ if uploaded_file:
         # Clean and normalize column names
         df.columns = df.columns.str.strip().str.replace(" ", "_").str.lower()
 
-        # Dynamically identify monthly columns (1–12) by string representation
-        monthly_columns = [str(i) for i in range(1, 13)]  # Expected month columns as strings
+        # Define monthly columns as Jan to Dec
+        monthly_columns = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
         if not all(col in df.columns for col in monthly_columns):
             raise KeyError(f"Expected monthly columns {monthly_columns} are missing or misnamed in the uploaded file.")
 
-        # Convert monthly columns to numeric
+        # Ensure monthly columns are numeric
         df[monthly_columns] = df[monthly_columns].apply(pd.to_numeric, errors='coerce').fillna(0)
 
         # Calculate Grand Total from monthly columns
         df['Grand_Total'] = df[monthly_columns].sum(axis=1)
 
-        # Calculate Last 6 months (July–December) and Last 3 months (October–December)
-        last_6_months = [str(i) for i in range(7, 13)]
-        last_3_months = [str(i) for i in range(10, 13)]
+        # Calculate Last 6 months (Jul–Dec) and Last 3 months (Oct–Dec)
+        last_6_months = ['jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+        last_3_months = ['oct', 'nov', 'dec']
 
         df['Absence_Days_Last_6_Months'] = df[last_6_months].sum(axis=1)
         df['Absence_Days_Last_3_Months'] = df[last_3_months].sum(axis=1)
