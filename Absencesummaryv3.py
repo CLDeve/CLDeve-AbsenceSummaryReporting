@@ -12,21 +12,26 @@ if uploaded_file:
         # Load the uploaded Excel File
         df = pd.ExcelFile(uploaded_file).parse(0)
 
-        # Identify monthly columns dynamically
-        monthly_columns = list(range(1, 13))  # Expected month columns (1–12)
+        # Clean and normalize column names
+        df.columns = df.columns.str.strip().str.replace(" ", "_").str.lower()
 
-        # Ensure monthly columns are numeric
+        # Dynamically identify monthly columns (1–12) by string representation
+        monthly_columns = [str(i) for i in range(1, 13)]  # Expected month columns as strings
+        if not all(col in df.columns for col in monthly_columns):
+            raise KeyError(f"Expected monthly columns {monthly_columns} are missing or misnamed in the uploaded file.")
+
+        # Convert monthly columns to numeric
         df[monthly_columns] = df[monthly_columns].apply(pd.to_numeric, errors='coerce').fillna(0)
 
         # Calculate Grand Total from monthly columns
-        df['Grand Total'] = df[monthly_columns].sum(axis=1)
+        df['Grand_Total'] = df[monthly_columns].sum(axis=1)
 
         # Calculate Last 6 months (July–December) and Last 3 months (October–December)
-        last_6_months = [7, 8, 9, 10, 11, 12]
-        last_3_months = [10, 11, 12]
+        last_6_months = [str(i) for i in range(7, 13)]
+        last_3_months = [str(i) for i in range(10, 13)]
 
-        df['Absence Days (Last 6 Months)'] = df[last_6_months].sum(axis=1)
-        df['Absence Days (Last 3 Months)'] = df[last_3_months].sum(axis=1)
+        df['Absence_Days_Last_6_Months'] = df[last_6_months].sum(axis=1)
+        df['Absence_Days_Last_3_Months'] = df[last_3_months].sum(axis=1)
 
         # Display Data in Streamlit
         st.subheader("Absence Summary Table")
