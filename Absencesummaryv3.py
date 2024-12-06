@@ -5,6 +5,19 @@ from datetime import datetime
 # Streamlit App Title
 st.title("Absence Summary Dashboard")
 
+# Display the counted items table
+st.subheader("Counted Absence Types")
+counted_items = pd.DataFrame({
+    "Absence Type": ['Absent', 'Absent Without Leave', 'Sick Leave', 'Unpaid Medical leave'],
+    "Description": [
+        "Days marked as absent",
+        "Days absent without prior approval",
+        "Days taken for medical reasons with a medical certificate",
+        "Days taken for medical reasons without pay"
+    ]
+})
+st.table(counted_items)
+
 # File Upload
 uploaded_file = st.file_uploader("Upload an Excel File", type=["xlsx"])
 
